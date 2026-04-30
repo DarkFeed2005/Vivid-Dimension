@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bloom & Co. — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black:       #0a0905;
+      --black-2:     #111008;
+      --black-3:     #1a1710;
+      --brown:       #5c3d1e;
+      --brown-light: #c9a46a;
+      --yellow:      #f5c518;
+      --yellow-2:    #e8b412;
+      --yellow-dim:  rgba(245,197,24,0.10);
+      --yellow-glow: rgba(245,197,24,0.22);
+      --cream:       #f7f0e3;
+      --muted:       rgba(232,220,200,0.5);
+      --font-display:'Cormorant Garamond', Georgia, serif;
+      --font-body:   'DM Sans', system-ui, sans-serif;
+      --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--cream);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL — decorative ── */
+    .panel-left {
+      position: relative;
+      background: var(--black-2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem;
+      overflow: hidden;
+    }
+
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 30% 70%, rgba(92,61,30,0.35) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 70% 20%, rgba(245,197,24,0.08) 0%, transparent 60%);
+    }
+
+    .panel-logo {
+      position: relative;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+    .panel-logo .star { color: var(--yellow); font-size: 1rem; }
+    .panel-logo em { font-style: italic; color: var(--yellow); }
+
+    .panel-hero {
+      position: relative;
+      z-index: 1;
+    }
+    .panel-hero h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--cream);
+      margin-bottom: 1.2rem;
+    }
+    .panel-hero h2 em { font-style: italic; color: var(--yellow); }
+    .panel-hero p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 360px;
+    }
+
+    .panel-quote {
+      position: relative;
+      z-index: 1;
+      border-left: 2px solid var(--yellow);
+      padding-left: 1.2rem;
+    }
+    .panel-quote p {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--brown-light);
+      line-height: 1.5;
+    }
+    .panel-quote span {
+      display: block;
+      margin-top: 0.5rem;
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Floating petals decoration */
+    .petal {
+      position: absolute;
+      border-radius: 50% 0 50% 0;
+      opacity: 0.06;
+      animation: floatPetal linear infinite;
+    }
+
+    /* ── RIGHT PANEL — form ── */
+    .panel-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      overflow-y: auto;
+    }
+
+    .auth-box {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* Tab switcher */
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(232,220,200,0.1);
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-bottom: -1px;
+    }
+    .auth-tab.active {
+      color: var(--yellow);
+      border-bottom-color: var(--yellow);
+    }
+
+    /* Form panels */
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; animation: fadeUp 0.4s var(--ease) forwards; }
+
+    .auth-panel h3 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--cream);
+      margin-bottom: 0.4rem;
+    }
+    .auth-panel h3 em { font-style: italic; color: var(--yellow); }
+    .auth-panel .sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    /* Form elements */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 1.1rem;
+    }
+    .form-group label {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap .icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.9rem;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .form-group input {
+      width: 100%;
+      background: var(--black-3);
+      border: 1px solid rgba(232,220,200,0.1);
+      border-radius: 3px;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input::placeholder { color: rgba(232,220,200,0.2); }
+    .form-group input:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px var(--yellow-dim);
+    }
+
+    /* Password toggle */
+    .toggle-pw {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+    }
+    .toggle-pw:hover { color: var(--yellow); }
+
+    /* Password strength bar */
+    .strength-bar {
+      height: 3px;
+      background: rgba(232,220,200,0.08);
+      border-radius: 2px;
+      margin-top: 0.4rem;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+    }
+    .strength-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      min-height: 1em;
+    }
+
+    /* Submit button */
+    .btn-auth {
+      width: 100%;
+      padding: 1rem;
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      border-radius: 3px;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.25s, transform 0.25s var(--ease), box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-auth:hover:not(:disabled) {
+      background: var(--yellow-2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px var(--yellow-glow);
+    }
+    .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Spinner inside button */
+    .btn-auth .spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    .btn-auth.loading .btn-label { display: none; }
+    .btn-auth.loading .spinner { display: block; }
+
+    /* Feedback */
+    .feedback {
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      text-align: center;
+      display: none;
+    }
+    .feedback.success {
+      display: block;
+      background: var(--yellow-dim);
+      border: 1px solid rgba(245,197,24,0.3);
+      color: var(--yellow);
+    }
+    .feedback.error {
+      display: block;
+      background: rgba(180,50,50,0.1);
+      border: 1px solid rgba(180,50,50,0.3);
+      color: #e57373;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(232,220,200,0.1);
+    }
+
+    /* Back to site link */
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--yellow); }
+
+    /* User avatar chip (shown after login) */
+    .user-chip {
+      display: none;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 1.2rem;
+      background: var(--black-3);
+      border: 1px solid rgba(245,197,24,0.15);
+      border-radius: 3px;
+      margin-bottom: 1.5rem;
+    }
+    .user-chip.visible { display: flex; }
+    .user-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--yellow);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+      color: var(--black);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .user-chip-info strong { display: block; font-size: 0.9rem; color: var(--cream); }
+    .user-chip-info span { font-size: 0.75rem; color: var(--muted); }
+    .btn-logout {
+      margin-left: auto;
+      background: none;
+      border: 1px solid rgba(232,220,200,0.15);
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: #e57373; color: #e57373; }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes floatPetal {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.06; }
+      90%  { opacity: 0.06; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 750px) {
+      body { grid-template-columns: 1fr; overflow: auto; }
+      .panel-left { display: none; }
+      .panel-right { min-height: 100vh; padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT decorative panel -->
+  <div class="panel-left">
+    <a href="index.html" class="panel-logo">
+      <span class="star">✦</span> Bloom <em>&amp;</em> Co.
+    </a>
+
+    <div class="panel-hero">
+      <h2>Where every<br />bloom <em>tells</em><br />a story.</h2>
+      <p>Join our community of floral enthusiasts and discover hand-curated arrangements crafted with passion.</p>
+    </div>
+
+    <div class="panel-quote">
+      <p>"Flowers are the music of the ground, from earth's lips spoken without sound."</p>
+      <span>— Edwin Curran</span>
+    </div>
+
+    <!-- Floating petal decorations (injected by JS) -->
+  </div>
+
+  <!-- RIGHT form panel -->
+  <div class="panel-right">
+    <div class="auth-box">
+
+      <!-- Already-logged-in chip -->
+      <div class="user-chip" id="userChip">
+        <div class="user-avatar" id="userAvatar">J</div>
+        <div class="user-chip-info">
+          <strong id="chipName">Jane Smith</strong>
+          <span id="chipEmail">jane@example.com</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn">Log out</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab active" data-tab="login">Sign In</button>
+        <button class="auth-tab" data-tab="register">Create Account</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div class="auth-panel active" id="panel-login">
+        <h3>Welcome <em>back</em></h3>
+        <p class="sub">Sign in to your account to continue.</p>
+
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <div class="input-wrap">
+              <span class="icon">✉</span>
+              <input type="email" id="loginEmail" placeholder="jane@example.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="input-wrap">
+              <span class="icon">🔒</span>
+              <input type="password" id="loginPassword" placeholder="••••••••" required />
+              <button type="button" class="toggle-pw" data-target="loginPassword">Show</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-auth" id="loginBtn">
+            <span class="btn-label">Sign In</span>
+            <span class="spinner"></span>
+          </button>
+        </form>
+        <div class="feedback" id="loginFeedback"></div>
+
+        <div class="divider">or</div>
+        <p style="text-align:center;font-size:0.8rem;color:var(--muted)">
+          Don't have an account?
+          <button onclick="switchTab('register')" style="background:none;border:none;color:var(--yellow);cursor:pointer;font-size:0.8rem;">Create one</button>
+        </p>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div class="auth-panel" id="panel-register">
+        <h3><em>Join</em> us</h3>
+        <p class="sub">Create your account — it only takes a moment.</p>
+
+        <form id="registerForm" novalidate>
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <div class="input-wrap">
+              <span class="icon">👤</span>
+              <input type="text" id="regName" placeholder="Jane Smith" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email Address</label>
+            <div class="input-wrap">
+              <span class="icon">✉</span>
+              <input type="email" id="regEmail" placeholder="jane@example.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <div class="input-wrap">
+              <span class="icon">🔒</span>
+              <input type="password" id="regPassword" placeholder="Min. 6 characters" required />
+              <button type="button" class="toggle-pw" data-target="regPassword">Show</button>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <div class="strength-label" id="strengthLabel"></div>
+          </div>
+          <div class="form-group">
+            <label for="regConfirm">Confirm Password</label>
+            <div class="input-wrap">
+              <span class="icon">🔒</span>
+              <input type="password" id="regConfirm" placeholder="Repeat password" required />
+            </div>
+          </div>
+          <button type="submit" class="btn-auth" id="registerBtn">
+            <span class="btn-label">Create Account</span>
+            <span class="spinner"></span>
+          </button>
+        </form>
+        <div class="feedback" id="registerFeedback"></div>
+
+        <div class="divider">or</div>
+        <p style="text-align:center;font-size:0.8rem;color:var(--muted)">
+          Already have an account?
+          <button onclick="switchTab('login')" style="background:none;border:none;color:var(--yellow);cursor:pointer;font-size:0.8rem;">Sign in</button>
+        </p>
+      </div>
+
+      <a href="index.html" class="back-link">← Back to Bloom &amp; Co.</a>
+    </div>
+  </div>
+
+<script>
+const API = '';   // same origin
+
+// ── Floating petals ──────────────────────────────────────────
+const leftPanel = document.querySelector('.panel-left');
+for (let i = 0; i < 8; i++) {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  const size = 40 + Math.random() * 120;
+  p.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    background:${Math.random()>0.5?'#f5c518':'#7a5230'};
+    animation-duration:${12+Math.random()*18}s;
+    animation-delay:${-Math.random()*20}s;
+  `;
+  leftPanel.appendChild(p);
+}
+
+// ── Tab switching ────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.auth-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${name}`));
+  clearFeedback();
+}
+document.getElementById('authTabs').addEventListener('click', e => {
+  const tab = e.target.closest('.auth-tab');
+  if (tab) switchTab(tab.dataset.tab);
+});
+
+// ── Password visibility toggle ───────────────────────────────
+document.querySelectorAll('.toggle-pw').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const inp = document.getElementById(btn.dataset.target);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.textContent = show ? 'Hide' : 'Show';
+  });
+});
+
+// ── Password strength ────────────────────────────────────────
+document.getElementById('regPassword').addEventListener('input', function () {
+  const v = this.value;
+  const fill = document.getElementById('strengthFill');
+  const label = document.getElementById('strengthLabel');
+  let score = 0;
+  if (v.length >= 6)  score++;
+  if (v.length >= 10) score++;
+  if (/[A-Z]/.test(v)) score++;
+  if (/[0-9]/.test(v)) score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const levels = [
+    { pct: '0%',   col: 'transparent', txt: '' },
+    { pct: '25%',  col: '#e57373',     txt: 'Weak' },
+    { pct: '50%',  col: '#ffb74d',     txt: 'Fair' },
+    { pct: '75%',  col: '#fff176',     txt: 'Good' },
+    { pct: '100%', col: '#f5c518',     txt: 'Strong' },
+  ];
+  const lvl = levels[Math.min(score, 4)];
+  fill.style.width = v ? lvl.pct : '0%';
+  fill.style.background = lvl.col;
+  label.textContent = v ? lvl.txt : '';
+});
+
+// ── Feedback helpers ─────────────────────────────────────────
+function showFeedback(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `feedback ${type}`;
+}
+function clearFeedback() {
+  document.querySelectorAll('.feedback').forEach(el => {
+    el.className = 'feedback'; el.textContent = '';
+  });
+}
+function setLoading(btn, loading) {
+  btn.disabled = loading;
+  btn.classList.toggle('loading', loading);
+}
+
+// ── Session helpers ──────────────────────────────────────────
+function saveSession(token, user) {
+  localStorage.setItem('bloomco_token', token);
+  localStorage.setItem('bloomco_user', JSON.stringify(user));
+}
+function getSession() {
+  const token = localStorage.getItem('bloomco_token');
+  const user  = JSON.parse(localStorage.getItem('bloomco_user') || 'null');
+  return { token, user };
+}
+function clearSession() {
+  localStorage.removeItem('bloomco_token');
+  localStorage.removeItem('bloomco_user');
+}
+
+// ── Show logged-in state ─────────────────────────────────────
+function showUserChip(user) {
+  document.getElementById('chipName').textContent  = user.name;
+  document.getElementById('chipEmail').textContent = user.email;
+  document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('userChip').classList.add('visible');
+  document.getElementById('authTabs').style.display = 'none';
+  document.querySelectorAll('.auth-panel').forEach(p => p.style.display = 'none');
+}
+
+// ── LOGIN ────────────────────────────────────────────────────
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  clearFeedback();
+  const btn   = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) return showFeedback('loginFeedback', 'Please fill in all fields.', 'error');
+
+  setLoading(btn, true);
+  try {
+    const res  = await fetch(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const json = await res.json();
+    if (!res.ok) return showFeedback('loginFeedback', json.message, 'error');
+
+    saveSession(json.token, json.user);
+    showFeedback('loginFeedback', `Welcome back, ${json.user.name}! Redirecting…`, 'success');
+    setTimeout(() => window.location.href = 'index.html', 1200);
+  } catch {
+    showFeedback('loginFeedback', 'Network error. Please try again.', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ── REGISTER ─────────────────────────────────────────────────
+document.getElementById('registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  clearFeedback();
+  const btn      = document.getElementById('registerBtn');
+  const name     = document.getElementById('regName').value.trim();
+  const email    = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const confirm  = document.getElementById('regConfirm').value;
+
+  if (!name || !email || !password || !confirm)
+    return showFeedback('registerFeedback', 'Please fill in all fields.', 'error');
+  if (password.length < 6)
+    return showFeedback('registerFeedback', 'Password must be at least 6 characters.', 'error');
+  if (password !== confirm)
+    return showFeedback('registerFeedback', 'Passwords do not match.', 'error');
+
+  setLoading(btn, true);
+  try {
+    const res  = await fetch(`${API}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const json = await res.json();
+    if (!res.ok) return showFeedback('registerFeedback', json.message, 'error');
+
+    saveSession(json.token, json.user);
+    showFeedback('registerFeedback', `Account created! Welcome, ${json.user.name}. Redirecting…`, 'success');
+    setTimeout(() => window.location.href = 'index.html', 1400);
+  } catch {
+    showFeedback('registerFeedback', 'Network error. Please try again.', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ── LOGOUT ───────────────────────────────────────────────────
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  clearSession();
+  window.location.reload();
+});
+
+// ── INIT — check existing session ───────────────────────────
+(function init() {
+  const { token, user } = getSession();
+  if (token && user) showUserChip(user);
+})();
+</script>
+</body>
+</html>
