@@ -723,3 +723,41 @@ h2 em { font-style: italic; color: var(--yellow); }
   .about-stats { grid-template-columns: 1fr 1fr; }
   .footer-inner { flex-direction: column; }
 }
+
+/* ── NAV AUTH STATE ─────────────────────────────────────────── */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.nav-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--black);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-username {
+  font-size: 0.8rem;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+}
+.nav-logout-btn {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  border: 1px solid rgba(232,220,200,0.2);
+  color: var(--muted);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-logout-btn:hover {
+  border-color: #e57373;
+  color: #e57373;
+}
