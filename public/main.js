@@ -426,3 +426,35 @@ function escHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// ─────────────────────────────────────────────────────────────
+//  6. AUTH — navbar state & token helper
+// ─────────────────────────────────────────────────────────────
+(function initAuth() {
+  const token = localStorage.getItem('bloomco_token');
+  const user  = JSON.parse(localStorage.getItem('bloomco_user') || 'null');
+  const navAuth = document.getElementById('navAuth');
+  if (!navAuth) return;
+
+  if (token && user) {
+    // Show user avatar + logout
+    navAuth.innerHTML = `
+      <div class="nav-user">
+        <div class="nav-avatar">${escHtml(user.name.charAt(0).toUpperCase())}</div>
+        <span class="nav-username">${escHtml(user.name.split(' ')[0])}</span>
+        <button class="nav-logout-btn" id="navLogout">Log out</button>
+      </div>`;
+    document.getElementById('navLogout').addEventListener('click', () => {
+      localStorage.removeItem('bloomco_token');
+      localStorage.removeItem('bloomco_user');
+      window.location.reload();
+    });
+  }
+  // If not logged in, the default "Sign In" link stays
+})();
+
+// Expose token getter for fetch calls
+function getAuthHeaders() {
+  const token = localStorage.getItem('bloomco_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
