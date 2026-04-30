@@ -69,7 +69,17 @@ Ensure you have Docker and Docker Compose installed, then run:
 | **Organic Accent** | Earthy Brown | `#5D4037` |
 | **Glassmorphism** | Dark Blur | `rgba(10, 9, 5, 0.97)` |
 
+### Contribution Guidelines
+
+- Follow existing code style and conventions
+- Write clear commit messages
+- Update documentation as needed
+- Test your changes across browsers
+- Ensure responsive design is maintained
+
 ## 👨‍💻 Author
 
-- **Your Name** <a href="https://github.com/yourusername" target="_blank" rel="noreferrer"> <img src="https://skillicons.dev/icons?i=github" alt="github" width="20" height="20"/> </a>
-- **LinkedIn** <a href="https://www.linkedin.com/in/yourprofile/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linkedin/linkedin-original.svg" alt="linkedin" width="20" height="2Since you have **Docker** and **Docker Compose** files already in your structure (as seen in `image_1a66e1.png`), I’ve integrated the Docker setup instructions into your premium template. This makes your project look "production-ready."
+- **GitHub** <a href="https://github.com/darkfeed2005" target="_blank" rel="noreferrer"> <img src="https://skillicons.dev/icons?i=github" alt="github" width="20" height="20"/> </a>
+- LinkedIn <a href="https://www.linkedin.com/in/kalana-yasassri-684591251/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linkedin/linkedin-original.svg" alt="linkedin" width="20" height="20"/> </a>
+- Instagram <a href="https://www.instagram.com/kalana_yasassri" target="_blank" rel="noreferrer"> <img src="https://skillicons.dev/icons?i=instagram" alt="instagram" width="20" height="20"/> </a>
+
